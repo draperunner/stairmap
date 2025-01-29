@@ -1,0 +1,82 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  cursor: pointer;
+  background-color: lightskyblue;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+
+  &:hover {
+    background-color: rgb(171, 213, 227);
+  }
+}
+
+dialog {
+  max-width: 400px;
+  z-index: 500;
+  padding: 20px 40px;
+  border: none;
+  border-radius: 10px;
+}
+
+#header {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  padding: 5px 20px;
+  z-index: 1000;
+  color: white;
+  text-shadow: 0 5px 10px rgba(0, 0, 0, 1);
+}
+
+#map {
+  height: 100%;
+}
+
+#info-bubble {
+  position: absolute;
+  z-index: 500;
+  bottom: 50px;
+  right: 50px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.div-icon {
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  > div {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    border-radius: 50%;
+  }
+}
+
+.extreme {
+  background-color: tomato;
+}
+
+.many {
+  background-color: orange;
+}
+
+.few {
+  background-color: white;
+}

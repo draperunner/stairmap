@@ -1,0 +1,8 @@
+*
+    Cache-Control: public, max-age=60, must-revalidate
+    Content-Security-Policy: default-src 'none'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src https://*.tile.openstreetmap.org
+    Permissions-Policy: geolocation=(self)
+    Referrer-Policy: strict-origin-when-cross-origin
+    Strict-Transport-Security: max-age=31556926; includeSubDomains
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: SAMEORIGIN

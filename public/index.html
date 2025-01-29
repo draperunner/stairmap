@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nn-NO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Kart over alle trapper i landet" />
+    <title>Trappetrening</title>
+    <link rel="stylesheet" href="/index.css" />
+    <link rel="stylesheet" href="/lib/leaflet.css" />
+  </head>
+  <body>
+    <header id="header">
+      <h1>Trappetrening.no</h1>
+    </header>
+    <div id="map"></div>
+    <dialog>
+      <h1>Trappetrening</h1>
+      <p>
+        Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
+        alle trappene i Noreg med minst 20 trinn.
+      </p>
+      <p>
+        Antal trinn er indikert på markøren. Meir info får du ved å trykkje på
+        eit ikon.
+      </p>
+
+      <p>
+        All data er henta frå
+        <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a
+        >. Bidra gjerne med nye trapper!
+      </p>
+      <button>Lukk</button>
+    </dialog>
+    <button id="info-bubble">Vis info</button>
+    <script src="/lib/leaflet.js"></script>
+    <script src="/index.js"></script>
+  </body>
+</html>

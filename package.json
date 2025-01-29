@@ -1,0 +1,16 @@
+{
+  "name": "stairmap",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --watch-path=./public --watch devServer.js",
+    "build": "node build.js"
+  },
+  "keywords": [],
+  "author": "draperunner",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}
