@@ -92,6 +92,24 @@ async function main() {
     join("node_modules", "leaflet", "dist", "leaflet.css"),
     join(lib, "leaflet.css"),
   );
+  await copyFile(
+    join(
+      "node_modules",
+      "leaflet.locatecontrol",
+      "dist",
+      "L.Control.Locate.min.js",
+    ),
+    join(lib, "leaflet-locate.js"),
+  );
+  await copyFile(
+    join(
+      "node_modules",
+      "leaflet.locatecontrol",
+      "dist",
+      "L.Control.Locate.min.css",
+    ),
+    join(lib, "leaflet-locate.css"),
+  );
 }
 
 main();

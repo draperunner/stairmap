@@ -10,6 +10,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 L.control.zoom({ position: "bottomright" }).addTo(map);
+L.control.locate({ position: "bottomright" }).addTo(map);
 
 const dialog = document.querySelector("dialog");
 const showButton = document.querySelector("#info-bubble");
