@@ -13,6 +13,7 @@ const mimeTypes = {
   ".css": "text/css",
   ".js": "application/javascript",
   ".geojson": "application/json+geojson",
+  ".svg": "image/svg+xml",
 };
 
 async function parseHeaders() {

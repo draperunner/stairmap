@@ -7,7 +7,8 @@ body {
 
 button {
   cursor: pointer;
-  background-color: lightskyblue;
+  background-color: orange;
+  color: black;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -15,7 +16,7 @@ button {
   font-size: 1rem;
 
   &:hover {
-    background-color: rgb(171, 213, 227);
+    background-color: darkorange;
   }
 }
 
@@ -30,11 +31,30 @@ dialog {
 #header {
   position: absolute;
   top: 0;
-  left: 10px;
+  left: 0;
   padding: 5px 20px;
   z-index: 1000;
   color: white;
   text-shadow: 0 5px 10px rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 600px) {
+  #header h1 {
+    font-size: 1.2rem;
+  }
+  #header img {
+    width: 30px;
+    height: 30px;
+  }
 }
 
 #map {
@@ -45,7 +65,7 @@ dialog {
   position: absolute;
   z-index: 500;
   bottom: 50px;
-  right: 50px;
+  left: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
@@ -74,7 +94,7 @@ dialog {
 }
 
 .many {
-  background-color: orange;
+  background-color: #ffa500;
 }
 
 .few {
