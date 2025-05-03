@@ -30,9 +30,9 @@ dialog {
 
 #header {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 5px 20px;
+  top: 20px;
+  left: 20px;
+  padding: 0;
   z-index: 1000;
   color: white;
   text-shadow: 0 5px 10px rgba(0, 0, 0, 1);
@@ -41,19 +41,14 @@ dialog {
   justify-content: center;
   gap: 12px;
 
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
   img {
     width: 48px;
     height: 48px;
-  }
-}
-
-@media (max-width: 600px) {
-  #header h1 {
-    font-size: 1.2rem;
-  }
-  #header img {
-    width: 30px;
-    height: 30px;
   }
 }
 
@@ -68,6 +63,19 @@ dialog {
   left: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+}
+
+#github-link {
+  position: absolute;
+  z-index: 500;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+
+  img {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .div-icon {
@@ -99,4 +107,29 @@ dialog {
 
 .few {
   background-color: white;
+}
+
+@media (max-width: 600px) {
+  #header {
+    top: 8px;
+    left: 8px;
+  }
+  #header h1 {
+    font-size: 1.2rem;
+  }
+  #header img {
+    width: 30px;
+    height: 30px;
+  }
+  #github-link {
+    top: 8px;
+    right: 8px;
+  }
+  #github-link img {
+    width: 24px;
+    height: 24px;
+  }
+  #info-bubble {
+    bottom: 24px;
+  }
 }
