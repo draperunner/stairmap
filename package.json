@@ -11,7 +11,6 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "leaflet": "^1.9.4",
-    "leaflet.locatecontrol": "^0.84.2"
+    "ol": "^10.6.1"
   }
 }

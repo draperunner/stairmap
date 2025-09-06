@@ -85,31 +85,11 @@ async function main() {
   await mkdir(lib, { recursive: true });
 
   await copyFile(
-    join("node_modules", "leaflet", "dist", "leaflet.js"),
-    join(lib, "leaflet.js"),
+    join("node_modules", "ol", "dist", "ol.js"),
+    join(lib, "ol.js"),
   );
-  await copyFile(
-    join("node_modules", "leaflet", "dist", "leaflet.css"),
-    join(lib, "leaflet.css"),
-  );
-  await copyFile(
-    join(
-      "node_modules",
-      "leaflet.locatecontrol",
-      "dist",
-      "L.Control.Locate.min.js",
-    ),
-    join(lib, "leaflet-locate.js"),
-  );
-  await copyFile(
-    join(
-      "node_modules",
-      "leaflet.locatecontrol",
-      "dist",
-      "L.Control.Locate.min.css",
-    ),
-    join(lib, "leaflet-locate.css"),
-  );
+
+  await copyFile(join("node_modules", "ol", "ol.css"), join(lib, "ol.css"));
 }
 
 main();

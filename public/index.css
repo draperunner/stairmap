@@ -97,16 +97,10 @@ dialog {
   }
 }
 
-.extreme {
-  background-color: tomato;
-}
-
-.many {
-  background-color: #ffa500;
-}
-
-.few {
+.ol-popup {
   background-color: white;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 @media (max-width: 600px) {
