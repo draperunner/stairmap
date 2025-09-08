@@ -8,7 +8,7 @@
     <meta
       name="description"
       content="Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
-        alle trappene i Noreg med minst 20 trinn."
+        alle trappene i Noreg og kor mange trinn dei har."
     />
     <meta
       name="keywords"
@@ -30,7 +30,7 @@
     <meta
       property="og:description"
       content="Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
-        alle trappene i Noreg med minst 20 trinn."
+        alle trappene i Noreg og kor mange trinn dei har."
     />
     <meta
       property="og:image"
@@ -51,16 +51,14 @@
     <meta
       property="twitter:description"
       content="Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
-        alle trappene i Noreg med minst 20 trinn."
+        alle trappene i Noreg og kor mange trinn dei har."
     />
     <meta
       property="twitter:image"
       content="https://trappetrening.no/screenshot.jpg"
     />
 
-    <title>
-      Trappetrening.no - Kart over alle trapper i Noreg med minst 20 trinn
-    </title>
+    <title>Trappetrening.no - Kart over alle trapper i Noreg</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="stylesheet" href="/index.css" />
@@ -84,20 +82,29 @@
       <h1>Trappetrening</h1>
       <p>
         Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
-        alle trappene i Noreg med minst 20 trinn.
+        alle trappene i Noreg og kor mange trinn dei har.
       </p>
       <p>
-        Antal trinn er indikert på markøren. Meir info får du ved å trykkje på
-        eit ikon.
+        Antal trinn er indikert på markøren. Trappene vert gruppert og summert
+        opp, så zoom inn for å sjå enkelttrapper.
       </p>
 
       <p>
-        All data er henta frå
+        Mange trapper er ikkje talde enno. Hjelp gjerne med å telje og legg inn
+        i
         <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a
-        >. Bidra gjerne med nye trapper!
+        >!
       </p>
       <button>Lukk</button>
     </dialog>
+    <div id="unknown-toggle-wrapper">
+      <label>
+        <input type="checkbox" id="toggle-unknown" />
+        <span id="toggle-unknown-label"
+          >Vis trapper utan kjent antal trinn</span
+        >
+      </label>
+    </div>
     <button id="info-bubble">Vis info</button>
     <a
       id="github-link"

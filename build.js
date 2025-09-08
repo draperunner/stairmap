@@ -10,11 +10,10 @@ async function fetchData() {
     const overpassUrl = "https://overpass-api.de/api/interpreter";
 
     const query = `
-      [out:json];
+      [out:json][timeout:300];
       area["ISO3166-1:alpha2"="NO"]->.a;
       (
-        way(area.a)["highway"="steps"]["step_count"]
-        ["step_count"~"^[2-9][0-9]$|^[1-9][0-9]{2,}$"];
+        way(area.a)["highway"="steps"];
       );
       out body;
       >;
@@ -22,6 +21,7 @@ async function fetchData() {
     `;
 
     console.log("Querying Overpass API...");
+    const start = Date.now();
 
     const response = await fetch(overpassUrl, {
       method: "POST",
@@ -33,7 +33,11 @@ async function fetchData() {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    console.log("Got successful response from Overpass API");
+    console.log(
+      "Got successful response from Overpass API after",
+      (Date.now() - start) / 1000,
+      "seconds",
+    );
 
     const data = await response.json();
 
@@ -57,10 +61,15 @@ async function fetchData() {
           ]),
         },
         properties: {
-          ...element.tags,
           id: element.nodes[0],
+          name: element.tags.name,
+          step_count: element.tags.step_count
+            ? Number(element.tags.step_count)
+            : undefined,
         },
       }));
+
+    console.log("Found", features.length, "features");
 
     const featureCollection = {
       type: "FeatureCollection",
