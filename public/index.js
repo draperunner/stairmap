@@ -80,9 +80,9 @@ function createMarker(feature, source) {
     centerOnMarker(lonlat);
     const popupHtml = `
       <h1>${title}</h1>
-      <p><a href="https://www.openstreetmap.org/way/${
+      <p><a href="https://www.openstreetmap.org/edit?way=${
         feature.id
-      }" target="_blank">Opne på OpenStreetMap</a></p>
+      }" target="_blank">Endre på OpenStreetMap</a></p>
       ${Object.entries(feature.properties)
         .map(([key, value]) => `${key}: ${value}`)
         .join("<br />")}
