@@ -138,29 +138,14 @@ dialog {
   }
 }
 
-.div-icon {
-  color: black;
-  font-weight: bold;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-
-  > div {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    border-radius: 50%;
-  }
-}
-
 .ol-popup {
   background-color: white;
   padding: 12px;
   border-radius: 8px;
+
+  h1 {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 600px) {
