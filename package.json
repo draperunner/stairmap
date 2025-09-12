@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node --watch-path=./public --watch devServer.js",
-    "build": "node build.js"
+    "start": "vite",
+    "dev": "vite",
+    "build": "node fetchData.js && vite build",
+    "preview": "vite preview",
+    "data": "node fetchData.js"
   },
   "keywords": [],
   "author": "draperunner",
@@ -12,5 +15,8 @@
   "description": "",
   "dependencies": {
     "ol": "^10.6.1"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
   }
 }

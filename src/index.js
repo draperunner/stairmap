@@ -1,26 +1,33 @@
+import { Map, View, Geolocation, Feature, Overlay } from "ol";
+import { Attribution, Zoom } from "ol/control";
+import { Tile, Vector as VectorLayer } from "ol/layer";
+import { Point } from "ol/geom";
+import { fromLonLat } from "ol/proj";
+import { OSM, Vector as VectorSource, Cluster } from "ol/source";
+import { Style, Circle, Fill, Text } from "ol/style";
+import "ol/ol.css";
+import "./index.css";
+
 // Shared bottom-right control container
 const controlsContainer = document.createElement("div");
 controlsContainer.className = "map-controls-bottom-right";
 document.getElementById("map").appendChild(controlsContainer);
 
-const map = new ol.Map({
+const map = new Map({
   target: "map",
   layers: [
-    new ol.layer.Tile({
-      source: new ol.source.OSM(),
+    new Tile({
+      source: new OSM(),
     }),
   ],
-  view: new ol.View({
-    center: ol.proj.fromLonLat([12.307778, 63.990556]),
+  view: new View({
+    center: fromLonLat([12.307778, 63.990556]),
     zoom: 5,
   }),
-  controls: [
-    new ol.control.Attribution(),
-    new ol.control.Zoom({ target: controlsContainer }),
-  ],
+  controls: [new Attribution(), new Zoom({ target: controlsContainer })],
 });
 
-const geolocation = new ol.Geolocation({
+const geolocation = new Geolocation({
   tracking: false,
   projection: map.getView().getProjection(),
 });
@@ -53,7 +60,7 @@ showButton.addEventListener("click", () => dialog.showModal());
 closeButton.addEventListener("click", () => dialog.close());
 
 function centerOnMarker(coordinates) {
-  map.getView().setCenter(ol.proj.fromLonLat(coordinates));
+  map.getView().setCenter(fromLonLat(coordinates));
   map.getView().setZoom(16);
 }
 
@@ -64,8 +71,8 @@ function createMarker(feature, source) {
   const firstPoint = feature.geometry.coordinates[0];
   const lonlat = [firstPoint[0], firstPoint[1]];
 
-  const marker = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.fromLonLat(lonlat)),
+  const marker = new Feature({
+    geometry: new Point(fromLonLat(lonlat)),
     name: title,
     featureId: feature.id,
     properties: feature.properties,
@@ -87,7 +94,7 @@ function createMarker(feature, source) {
         .map(([key, value]) => `${key}: ${value}`)
         .join("<br />")}
     `;
-    showPopup(ol.proj.fromLonLat(lonlat), popupHtml);
+    showPopup(fromLonLat(lonlat), popupHtml);
   };
 }
 
@@ -95,7 +102,7 @@ function createMarker(feature, source) {
 const popupContainer = document.createElement("div");
 popupContainer.className = "ol-popup";
 document.body.appendChild(popupContainer);
-const popupOverlay = new ol.Overlay({
+const popupOverlay = new Overlay({
   element: popupContainer,
   positioning: "bottom-center",
   offset: [0, -20],
@@ -116,10 +123,10 @@ async function loadStairs() {
   }
   const featureCollection = await response.json();
 
-  const knownStepsSource = new ol.source.Vector();
-  const unknownStepsSource = new ol.source.Vector();
+  const knownStepsSource = new VectorSource();
+  const unknownStepsSource = new VectorSource();
 
-  const clusterSource = new ol.source.Cluster({
+  const clusterSource = new Cluster({
     distance: 32,
     minDistance: 32,
     source: knownStepsSource,
@@ -138,15 +145,15 @@ async function loadStairs() {
   function circleStyle(feature) {
     const steps = feature.get("stepCount");
     if (!circleStyleCache[steps]) {
-      circleStyleCache[steps] = new ol.style.Style({
-        image: new ol.style.Circle({
+      circleStyleCache[steps] = new Style({
+        image: new Circle({
           radius: 15,
-          fill: new ol.style.Fill({ color: circleColor(steps) }),
+          fill: new Fill({ color: circleColor(steps) }),
         }),
-        text: new ol.style.Text({
+        text: new Text({
           text: String(steps ?? "?"),
           font: "bold 14px sans-serif",
-          fill: new ol.style.Fill({
+          fill: new Fill({
             color: steps !== undefined ? "#000" : "#fff",
           }),
           offsetY: 2,
@@ -171,15 +178,15 @@ async function loadStairs() {
     }
 
     if (!clusterStyleCache[totalStepCount]) {
-      clusterStyleCache[totalStepCount] = new ol.style.Style({
-        image: new ol.style.Circle({
+      clusterStyleCache[totalStepCount] = new Style({
+        image: new Circle({
           radius: 15,
-          fill: new ol.style.Fill({ color: circleColor(totalStepCount) }),
+          fill: new Fill({ color: circleColor(totalStepCount) }),
         }),
-        text: new ol.style.Text({
+        text: new Text({
           text: `${totalStepCount ?? "?"}`,
           font: "bold 14px sans-serif",
-          fill: new ol.style.Fill({ color: "#000" }),
+          fill: new Fill({ color: "#000" }),
           offsetY: 2,
         }),
       });
@@ -188,12 +195,12 @@ async function loadStairs() {
     return clusterStyleCache[totalStepCount];
   }
 
-  const clusterLayer = new ol.layer.Vector({
+  const clusterLayer = new VectorLayer({
     source: clusterSource,
     style: clusterStyle,
   });
 
-  const unknownStepsLayer = new ol.layer.Vector({
+  const unknownStepsLayer = new VectorLayer({
     source: unknownStepsSource,
     declutter: true,
     style: circleStyle,

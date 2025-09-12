@@ -92,13 +92,6 @@ async function main() {
 
   const lib = join("public", "lib");
   await mkdir(lib, { recursive: true });
-
-  await copyFile(
-    join("node_modules", "ol", "dist", "ol.js"),
-    join(lib, "ol.js"),
-  );
-
-  await copyFile(join("node_modules", "ol", "ol.css"), join(lib, "ol.css"));
 }
 
 main();
