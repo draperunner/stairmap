@@ -1,47 +1,13 @@
-import { Map, View, Geolocation, Feature, Overlay } from "ol";
-import { Attribution, Zoom } from "ol/control";
-import { Tile, Vector as VectorLayer } from "ol/layer";
+import { Feature, Overlay } from "ol";
+import { Vector as VectorLayer } from "ol/layer";
 import { Point } from "ol/geom";
 import { fromLonLat } from "ol/proj";
-import { OSM, Vector as VectorSource, Cluster } from "ol/source";
-import { Style, Circle, Fill, Text } from "ol/style";
+import { Vector as VectorSource, Cluster } from "ol/source";
+import { Circle, Fill, Style, Text } from "ol/style";
 import "ol/ol.css";
 import "./index.css";
-
-// Shared bottom-right control container
-const controlsContainer = document.createElement("div");
-controlsContainer.className = "map-controls-bottom-right";
-document.getElementById("map").appendChild(controlsContainer);
-
-const map = new Map({
-  target: "map",
-  layers: [
-    new Tile({
-      source: new OSM(),
-    }),
-  ],
-  view: new View({
-    center: fromLonLat([12.307778, 63.990556]),
-    zoom: 5,
-  }),
-  controls: [new Attribution(), new Zoom({ target: controlsContainer })],
-});
-
-const geolocation = new Geolocation({
-  tracking: false,
-  projection: map.getView().getProjection(),
-});
-
-function locateUser() {
-  geolocation.setTracking(true);
-  geolocation.once("change:position", () => {
-    const coordinates = geolocation.getPosition();
-    if (coordinates) {
-      map.getView().animate({ center: coordinates, zoom: 14, duration: 500 });
-    }
-    geolocation.setTracking(false);
-  });
-}
+import { locateUser } from "./geolocation.js";
+import { map, controlsContainer } from "./map.js";
 
 // Simple locate button
 const locateBtn = document.createElement("button");
