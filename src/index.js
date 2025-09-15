@@ -92,13 +92,18 @@ async function loadStairs() {
   const knownStepsSource = new VectorSource();
   const unknownStepsSource = new VectorSource();
 
-  const clusterSource = new Cluster({
+  const knownClusterSource = new Cluster({
     distance: 32,
     minDistance: 32,
     source: knownStepsSource,
   });
 
-  // Separate styling: one layer for circles (all drawn), one layer for labels (decluttered)
+  const unknownClusterSource = new Cluster({
+    distance: 32,
+    minDistance: 32,
+    source: unknownStepsSource,
+  });
+
   function circleColor(steps) {
     if (steps === undefined) return "#55f";
     if (steps > 100) return "tomato";
@@ -106,53 +111,34 @@ async function loadStairs() {
     return "#fff";
   }
 
-  const circleStyleCache = {};
-
-  function circleStyle(feature) {
-    const steps = feature.get("stepCount");
-    if (!circleStyleCache[steps]) {
-      circleStyleCache[steps] = new Style({
-        image: new Circle({
-          radius: 15,
-          fill: new Fill({ color: circleColor(steps) }),
-        }),
-        text: new Text({
-          text: String(steps ?? "?"),
-          font: "bold 14px sans-serif",
-          fill: new Fill({
-            color: steps !== undefined ? "#000" : "#fff",
-          }),
-          offsetY: 2,
-        }),
-      });
-    }
-    return circleStyleCache[steps];
-  }
-
   const clusterStyleCache = {};
 
   function clusterStyle(feature) {
     const features = feature.get("features");
 
-    const totalStepCount = features.reduce((sum, f) => {
-      const steps = f.get("stepCount");
-      return sum + (typeof steps === "number" ? steps : 0);
-    }, 0);
+    const unknown = features.some((f) => f.get("stepCount") === undefined);
 
-    if (!totalStepCount || feature.get("hiddenByUnknownFilter")) {
-      return null;
-    }
+    const totalStepCount = unknown
+      ? undefined
+      : features.reduce((sum, f) => {
+          const steps = f.get("stepCount");
+          return sum + (typeof steps === "number" ? steps : 0);
+        }, 0);
 
     if (!clusterStyleCache[totalStepCount]) {
       clusterStyleCache[totalStepCount] = new Style({
         image: new Circle({
           radius: 15,
-          fill: new Fill({ color: circleColor(totalStepCount) }),
+          fill: new Fill({
+            color: circleColor(totalStepCount),
+          }),
         }),
         text: new Text({
           text: `${totalStepCount ?? "?"}`,
           font: "bold 14px sans-serif",
-          fill: new Fill({ color: "#000" }),
+          fill: new Fill({
+            color: totalStepCount !== undefined ? "#000" : "#fff",
+          }),
           offsetY: 2,
         }),
       });
@@ -161,18 +147,17 @@ async function loadStairs() {
     return clusterStyleCache[totalStepCount];
   }
 
-  const clusterLayer = new VectorLayer({
-    source: clusterSource,
+  const knownClusterLayer = new VectorLayer({
+    source: knownClusterSource,
     style: clusterStyle,
   });
 
-  const unknownStepsLayer = new VectorLayer({
-    source: unknownStepsSource,
-    declutter: true,
-    style: circleStyle,
+  const unknownClusterLayer = new VectorLayer({
+    source: unknownClusterSource,
+    style: clusterStyle,
   });
 
-  map.addLayer(clusterLayer);
+  map.addLayer(knownClusterLayer);
 
   let stairsWithUnknownCount = 0;
 
@@ -191,11 +176,11 @@ async function loadStairs() {
   const toggle = document.getElementById("toggle-unknown");
   function applyUnknownFilter() {
     if (toggle.checked) {
-      map.addLayer(unknownStepsLayer);
-      map.removeLayer(clusterLayer);
+      map.addLayer(unknownClusterLayer);
+      map.removeLayer(knownClusterLayer);
     } else {
-      map.removeLayer(unknownStepsLayer);
-      map.addLayer(clusterLayer);
+      map.removeLayer(unknownClusterLayer);
+      map.addLayer(knownClusterLayer);
     }
   }
   toggle.addEventListener("change", applyUnknownFilter);
