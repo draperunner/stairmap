@@ -5,7 +5,7 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "node fetchData.js && vite build",
+    "build": "node fetchData.js && TZ=Europe/Oslo VITE_BUILD_TIME=$(date +\"%d.%m.%Y %H:%M\") vite build",
     "preview": "vite preview",
     "data": "node fetchData.js"
   },
