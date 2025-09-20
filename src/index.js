@@ -177,7 +177,11 @@ async function loadStairs() {
   unknownCountElement.textContent = `Vis trapper utan kjent antal trinn (${stairsWithUnknownCount})`;
 
   const toggle = document.getElementById("toggle-unknown");
+  toggle.checked = localStorage.getItem("showUnknown") === "true";
+
   function applyUnknownFilter() {
+    localStorage.setItem("showUnknown", `${toggle.checked}`);
+
     if (toggle.checked) {
       map.addLayer(unknownClusterLayer);
       map.removeLayer(knownClusterLayer);
