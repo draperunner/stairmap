@@ -21,7 +21,10 @@ const dialog = document.querySelector("dialog");
 const showButton = document.querySelector("#info-bubble");
 const closeButton = document.querySelector("dialog button");
 
-dialog.showModal();
+if (!localStorage.getItem("seenInfoBubble")) {
+  dialog.showModal();
+  localStorage.setItem("seenInfoBubble", "true");
+}
 showButton.addEventListener("click", () => dialog.showModal());
 closeButton.addEventListener("click", () => dialog.close());
 
