@@ -191,6 +191,7 @@ async function loadStairs() {
     }
   }
   toggle.addEventListener("change", applyUnknownFilter);
+  applyUnknownFilter();
 
   // Add click handler for popups
   map.on("singleclick", function (evt) {
