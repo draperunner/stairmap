@@ -1,11 +1,13 @@
 import { writeFile, copyFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
+const MAX_RETRIES = 3;
+
 /**
  * Fetches stair data from the Overpass API, maps it to
  * GeoJSON and saves it to public/stairs.geojson.
  */
-async function fetchData() {
+async function fetchData(retryNumber = 0) {
   const overpassUrl = "https://overpass-api.de/api/interpreter";
 
   const query = `
@@ -29,6 +31,21 @@ async function fetchData() {
   });
 
   if (!response.ok) {
+    const isRetryableError = response.status === 429 || response.status >= 500;
+
+    if (isRetryableError && retryNumber < MAX_RETRIES) {
+      const retry = retryNumber + 1;
+      const sleepTimeSeconds = 2 + Math.pow(2, retry); // 4, 6, 10 seconds
+      console.log(
+        `Overpass API request failed with status ${response.status}. Retrying in ${sleepTimeSeconds} seconds... (retry ${retry}/${MAX_RETRIES})`,
+      );
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, sleepTimeSeconds * 1000),
+      );
+      return fetchData(retry);
+    }
+
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
 
