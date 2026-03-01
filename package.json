@@ -14,9 +14,9 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "ol": "^10.6.1"
+    "ol": "^10.8.0"
   },
   "devDependencies": {
-    "vite": "^7.1.12"
+    "vite": "^7.3.1"
   }
 }
