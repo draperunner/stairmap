@@ -3,6 +3,13 @@ import { join } from "node:path";
 
 const MAX_RETRIES = 3;
 
+const USER_AGENT = process.env.USER_AGENT;
+
+if (!USER_AGENT) {
+  console.error("Error: USER_AGENT environment variable is not set.");
+  process.exit(1);
+}
+
 /**
  * Fetches stair data from the Overpass API, maps it to
  * GeoJSON and saves it to public/stairs.geojson.
@@ -26,7 +33,10 @@ async function fetchData(retryNumber = 0) {
 
   const response = await fetch(overpassUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": USER_AGENT,
+    },
     body: `data=${encodeURIComponent(query)}`,
   });
 
