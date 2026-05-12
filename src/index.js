@@ -1,21 +1,6 @@
-import { Feature, Overlay } from "ol";
-import { Vector as VectorLayer } from "ol/layer";
-import { Point } from "ol/geom";
-import { fromLonLat } from "ol/proj";
-import { Vector as VectorSource, Cluster } from "ol/source";
-import { Circle, Fill, Style, Text } from "ol/style";
-import "ol/ol.css";
+import { Popup, LngLatBounds } from "maplibre-gl";
 import "./index.css";
-import { locateUser } from "./geolocation.js";
-import { map, controlsContainer } from "./map.js";
-
-// Simple locate button
-const locateBtn = document.createElement("button");
-locateBtn.textContent = "📍";
-locateBtn.title = "Finn meg";
-locateBtn.className = "locate-btn";
-locateBtn.addEventListener("click", locateUser);
-controlsContainer.appendChild(locateBtn);
+import { map } from "./map.js";
 
 const dialog = document.querySelector("dialog");
 const showButton = document.querySelector("#info-bubble");
@@ -28,211 +13,151 @@ if (!localStorage.getItem("seenInfoBubble")) {
 showButton.addEventListener("click", () => dialog.showModal());
 closeButton.addEventListener("click", () => dialog.close());
 
-function centerOnMarker(coordinates) {
-  map.getView().setCenter(fromLonLat(coordinates));
-  map.getView().setZoom(16);
-}
+const KNOWN_LAYERS = ["known-steps", "known-circles", "known-count"];
+const UNKNOWN_LAYERS = ["unknown-steps", "unknown-circles", "unknown-count"];
 
-function createMarker(feature, source) {
-  const stepCount = feature.properties.step_count;
-  const title =
-    feature.properties.name || `Trapp med ${stepCount ?? "ukjent antal"} trinn`;
-  const firstPoint = feature.geometry.coordinates[0];
-  const lonlat = [firstPoint[0], firstPoint[1]];
+const toggle = document.getElementById("toggle-unknown");
+const toggleLabel = document.getElementById("toggle-unknown-label");
 
-  const marker = new Feature({
-    geometry: new Point(fromLonLat(lonlat)),
-    name: title,
-    featureId: feature.id,
-    properties: feature.properties,
-    stepCount,
-    lonlat,
+fetch("/counts.json")
+  .then((r) => r.json())
+  .then(({ unknown }) => {
+    toggleLabel.textContent = `Vis trapper utan kjent antal trinn (${unknown})`;
   });
 
-  marker.setId(feature.id);
-  source.addFeature(marker);
-
-  marker.onClick = function () {
-    centerOnMarker(lonlat);
-    const popupHtml = `
-      <h1>${title}</h1>
-      <p><a href="https://www.openstreetmap.org/edit?way=${
-        feature.id
-      }" target="_blank">Endre på OpenStreetMap</a></p>
-      ${Object.entries(feature.properties)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join("<br />")}
-    `;
-    showPopup(fromLonLat(lonlat), popupHtml);
-  };
-}
-
-// Popup overlay for OpenLayers
-const popupContainer = document.createElement("div");
-popupContainer.className = "ol-popup";
-document.body.appendChild(popupContainer);
-const popupOverlay = new Overlay({
-  element: popupContainer,
-  positioning: "bottom-center",
-  offset: [0, -20],
-  autoPan: true,
-  autoPanAnimation: { duration: 250 },
-});
-map.addOverlay(popupOverlay);
-
-function showPopup(coordinate, html) {
-  popupContainer.innerHTML = html;
-  popupOverlay.setPosition(coordinate);
-}
-
-async function loadStairs() {
-  const response = await fetch("/stairs.geojson");
-  if (!response.ok) {
-    throw new Error("Failed to load JSON file");
-  }
-  const featureCollection = await response.json();
-
-  const knownStepsSource = new VectorSource();
-  const unknownStepsSource = new VectorSource();
-
-  const knownClusterSource = new Cluster({
-    distance: 32,
-    minDistance: 32,
-    source: knownStepsSource,
-  });
-
-  const unknownClusterSource = new Cluster({
-    distance: 32,
-    minDistance: 32,
-    source: unknownStepsSource,
-  });
-
-  function circleColor(steps) {
-    if (steps === undefined) return "#55f";
-    if (steps > 100) return "tomato";
-    if (steps > 50) return "#ffa500";
-    return "#fff";
-  }
-
-  const clusterStyleCache = {};
-
-  function clusterStyle(feature) {
-    const features = feature.get("features");
-
-    const unknown = features.some((f) => f.get("stepCount") === undefined);
-
-    const totalStepCount = unknown
-      ? undefined
-      : features.reduce((sum, f) => {
-          const steps = f.get("stepCount");
-          return sum + (typeof steps === "number" ? steps : 0);
-        }, 0);
-
-    if (!clusterStyleCache[totalStepCount]) {
-      clusterStyleCache[totalStepCount] = new Style({
-        image: new Circle({
-          radius: 15,
-          fill: new Fill({
-            color: circleColor(totalStepCount),
-          }),
-        }),
-        text: new Text({
-          text: `${totalStepCount ?? "?"}`,
-          font: "bold 14px sans-serif",
-          fill: new Fill({
-            color: totalStepCount !== undefined ? "#000" : "#fff",
-          }),
-          offsetY: 2,
-        }),
-      });
+map.on("load", () => {
+  function setLayersVisibility(layers, visible) {
+    const value = visible ? "visible" : "none";
+    for (const id of layers) {
+      map.setLayoutProperty(id, "visibility", value);
     }
-
-    return clusterStyleCache[totalStepCount];
   }
 
-  const knownClusterLayer = new VectorLayer({
-    source: knownClusterSource,
-    style: clusterStyle,
-  });
+  let selected = null; // { wayId, pointSourceId } | null
 
-  const unknownClusterLayer = new VectorLayer({
-    source: unknownClusterSource,
-    style: clusterStyle,
-  });
+  function clearSelection() {
+    if (!selected) return;
+    map.removeFeatureState({ source: "stairs", id: selected.wayId });
+    map.removeFeatureState({
+      source: selected.pointSourceId,
+      id: selected.wayId,
+    });
+    selected = null;
+  }
 
-  map.addLayer(knownClusterLayer);
+  function selectFeature(wayId, pointSourceId) {
+    if (selected && selected.wayId === wayId) return;
+    clearSelection();
+    selected = { wayId, pointSourceId };
+    map.setFeatureState({ source: "stairs", id: wayId }, { selected: true });
+    map.setFeatureState(
+      { source: pointSourceId, id: wayId },
+      { selected: true },
+    );
+  }
 
-  let stairsWithUnknownCount = 0;
-
-  featureCollection.features.forEach((feature) => {
-    if (feature.properties.step_count === undefined) {
-      stairsWithUnknownCount += 1;
-      createMarker(feature, unknownStepsSource);
-    } else {
-      createMarker(feature, knownStepsSource);
-    }
-  });
-
-  const unknownCountElement = document.getElementById("toggle-unknown-label");
-  unknownCountElement.textContent = `Vis trapper utan kjent antal trinn (${stairsWithUnknownCount})`;
-
-  const toggle = document.getElementById("toggle-unknown");
   toggle.checked = localStorage.getItem("showUnknown") === "true";
 
-  function applyUnknownFilter() {
+  function applyToggle() {
     localStorage.setItem("showUnknown", `${toggle.checked}`);
+    setLayersVisibility(KNOWN_LAYERS, !toggle.checked);
+    setLayersVisibility(UNKNOWN_LAYERS, toggle.checked);
+    clearSelection();
+    popup.remove();
+  }
 
-    if (toggle.checked) {
-      map.addLayer(unknownClusterLayer);
-      map.removeLayer(knownClusterLayer);
+  const popup = new Popup({
+    closeButton: false,
+    closeOnClick: true,
+    anchor: "bottom",
+    offset: [0, -16],
+  });
+  popup.on("close", clearSelection);
+
+  toggle.addEventListener("change", applyToggle);
+  applyToggle();
+
+  function buildPopupHtml(wayId, properties) {
+    const stepCount = properties.step_count;
+    const title =
+      properties.name || `Trapp med ${stepCount ?? "ukjent antal"} trinn`;
+    const propsList = Object.entries(properties)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("<br />");
+    return `
+      <h1>${title}</h1>
+      <p><a href="https://www.openstreetmap.org/edit?way=${wayId}" target="_blank">Endre på OpenStreetMap</a></p>
+      ${propsList}
+    `;
+  }
+
+  function showFeaturePopup(lngLat, wayId, properties) {
+    popup.setLngLat(lngLat).setHTML(buildPopupHtml(wayId, properties)).addTo(map);
+  }
+
+  function focusOnStair(wayId, fallbackCenter) {
+    const lines = map.querySourceFeatures("stairs", {
+      filter: ["==", ["id"], wayId],
+    });
+    const coords = lines[0]?.geometry.coordinates;
+    if (coords && coords.length > 0) {
+      const bounds = coords.reduce(
+        (b, c) => b.extend(c),
+        new LngLatBounds(coords[0], coords[0]),
+      );
+      map.fitBounds(bounds, {
+        padding: { top: 80, bottom: 200, left: 80, right: 80 },
+        maxZoom: 19,
+      });
     } else {
-      map.removeLayer(unknownClusterLayer);
-      map.addLayer(knownClusterLayer);
+      map.easeTo({
+        center: fallbackCenter,
+        zoom: Math.max(map.getZoom(), 16),
+      });
     }
   }
-  toggle.addEventListener("change", applyUnknownFilter);
-  applyUnknownFilter();
 
-  // Add click handler for popups
-  map.on("singleclick", function (evt) {
-    let handled = false;
-    map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-      // If this is a cluster feature, unwrap it
-      const clustered = feature.get("features");
-      if (Array.isArray(clustered)) {
-        if (clustered.length === 1) {
-          const original = clustered[0];
-          if (original.onClick) {
-            original.onClick();
-            handled = true;
-          }
-        } else if (clustered.length > 1) {
-          map.getView().animate({
-            center: evt.coordinate,
-            zoom: map.getView().getZoom() + 2,
-            duration: 250,
-          });
-          handled = true;
-        }
+  for (const [circleLayer, sourceId] of [
+    ["known-circles", "known-points"],
+    ["unknown-circles", "unknown-points"],
+  ]) {
+    map.on("click", circleLayer, async (e) => {
+      const feature = e.features[0];
+      const clusterId = feature.properties.cluster_id;
+      if (clusterId != null) {
+        const source = map.getSource(sourceId);
+        const zoom = await source.getClusterExpansionZoom(clusterId);
+        map.easeTo({ center: feature.geometry.coordinates, zoom });
         return;
       }
-
-      if (feature.onClick) {
-        feature.onClick();
-        handled = true;
-      }
+      selectFeature(feature.id, sourceId);
+      focusOnStair(feature.id, feature.geometry.coordinates);
+      showFeaturePopup(feature.geometry.coordinates, feature.id, feature.properties);
     });
+  }
 
-    if (!handled) {
-      popupOverlay.setPosition(undefined);
-    }
-  });
+  for (const [lineLayer, sourceId] of [
+    ["known-steps", "known-points"],
+    ["unknown-steps", "unknown-points"],
+  ]) {
+    map.on("click", lineLayer, (e) => {
+      const feature = e.features[0];
+      selectFeature(feature.id, sourceId);
+      showFeaturePopup(e.lngLat, feature.id, feature.properties);
+    });
+  }
 
-  // Pointer cursor feedback
-  map.on("pointermove", (evt) => {
-    const hit = map.hasFeatureAtPixel(evt.pixel);
-    map.getTargetElement().style.cursor = hit ? "pointer" : "";
-  });
-}
-
-loadStairs();
+  for (const layerId of [
+    "known-circles",
+    "unknown-circles",
+    "known-steps",
+    "unknown-steps",
+  ]) {
+    map.on("mouseenter", layerId, () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", layerId, () => {
+      map.getCanvas().style.cursor = "";
+    });
+  }
+});

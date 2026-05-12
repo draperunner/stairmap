@@ -14,7 +14,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "ol": "^10.8.0"
+    "maplibre-gl": "^5.24.0"
   },
   "devDependencies": {
     "vite": "^7.3.1"

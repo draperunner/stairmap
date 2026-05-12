@@ -102,12 +102,49 @@ async function fetchData(retryNumber = 0) {
     features,
   };
 
-  console.log("Writing to stairs.geojson...");
+  const knownPoints = { type: "FeatureCollection", features: [] };
+  const unknownPoints = { type: "FeatureCollection", features: [] };
 
-  await writeFile(
-    join("public", "stairs.geojson"),
-    JSON.stringify(featureCollection),
-  );
+  for (const feature of features) {
+    const point = {
+      type: "Feature",
+      id: feature.id,
+      properties: feature.properties,
+      geometry: {
+        type: "Point",
+        coordinates: feature.geometry.coordinates[0],
+      },
+    };
+    if (feature.properties.step_count == null) {
+      unknownPoints.features.push(point);
+    } else {
+      knownPoints.features.push(point);
+    }
+  }
+
+  console.log("Writing geojson files and counts...");
+
+  await Promise.all([
+    writeFile(
+      join("public", "stairs.geojson"),
+      JSON.stringify(featureCollection),
+    ),
+    writeFile(
+      join("public", "stairs-known.geojson"),
+      JSON.stringify(knownPoints),
+    ),
+    writeFile(
+      join("public", "stairs-unknown.geojson"),
+      JSON.stringify(unknownPoints),
+    ),
+    writeFile(
+      join("public", "counts.json"),
+      JSON.stringify({
+        known: knownPoints.features.length,
+        unknown: unknownPoints.features.length,
+      }),
+    ),
+  ]);
 }
 
 async function main() {

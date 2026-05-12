@@ -1,25 +1,35 @@
-import { Map, View } from "ol";
-import { Attribution, Zoom } from "ol/control";
-import { Tile } from "ol/layer";
-import { fromLonLat } from "ol/proj";
-import { OSM } from "ol/source";
-
-// Shared bottom-right control container
-export const controlsContainer = document.createElement("div");
-
-controlsContainer.className = "map-controls-bottom-right";
-document.getElementById("map").appendChild(controlsContainer);
+import "maplibre-gl/dist/maplibre-gl.css";
+import { Map, GeolocateControl, NavigationControl } from "maplibre-gl";
+import style from "./style.json";
 
 export const map = new Map({
-  target: "map",
-  layers: [
-    new Tile({
-      source: new OSM(),
+  container: "map",
+  center: [12.307778, 63.990556],
+  zoom: 4,
+  style: "https://tiles.openfreemap.org/styles/liberty",
+});
+
+map.on("load", () => {
+  for (const [id, source] of Object.entries(style.sources)) {
+    map.addSource(id, source);
+  }
+  for (const layer of style.layers) {
+    map.addLayer(layer);
+  }
+
+  map.addControl(
+    new GeolocateControl({
+      positionOptions: { enableHighAccuracy: true },
+      trackUserLocation: true,
     }),
-  ],
-  view: new View({
-    center: fromLonLat([12.307778, 63.990556]),
-    zoom: 5,
-  }),
-  controls: [new Attribution(), new Zoom({ target: controlsContainer })],
+    "bottom-right",
+  );
+
+  map.addControl(
+    new NavigationControl({
+      showZoom: true,
+      showCompass: false,
+    }),
+    "bottom-right",
+  );
 });

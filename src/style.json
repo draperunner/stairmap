@@ -1,0 +1,147 @@
+{
+  "sources": {
+    "stairs": {
+      "type": "geojson",
+      "data": "/stairs.geojson"
+    },
+    "known-points": {
+      "type": "geojson",
+      "data": "/stairs-known.geojson",
+      "cluster": true,
+      "clusterRadius": 32,
+      "clusterMaxZoom": 14,
+      "clusterProperties": {
+        "sum_steps": [
+          "+",
+          ["coalesce", ["to-number", ["get", "step_count"]], 0]
+        ]
+      }
+    },
+    "unknown-points": {
+      "type": "geojson",
+      "data": "/stairs-unknown.geojson",
+      "cluster": true,
+      "clusterRadius": 32,
+      "clusterMaxZoom": 14
+    }
+  },
+  "layers": [
+    {
+      "id": "unknown-steps",
+      "type": "line",
+      "source": "stairs",
+      "filter": ["==", ["get", "step_count"], null],
+      "paint": {
+        "line-dasharray": [1, 1],
+        "line-color": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          "orange",
+          "#55f"
+        ],
+        "line-width": 4
+      }
+    },
+    {
+      "id": "known-steps",
+      "type": "line",
+      "source": "stairs",
+      "filter": ["!=", ["get", "step_count"], null],
+      "paint": {
+        "line-dasharray": [1, 1],
+        "line-color": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          "orange",
+          [
+            "step",
+            [
+              "coalesce",
+              ["get", "sum_steps"],
+              ["to-number", ["get", "step_count"]]
+            ],
+            "#fff",
+            51,
+            "#ffa500",
+            101,
+            "tomato"
+          ]
+        ],
+        "line-width": 4
+      }
+    },
+    {
+      "id": "known-circles",
+      "type": "circle",
+      "source": "known-points",
+      "paint": {
+        "circle-radius": 15,
+        "circle-color": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          "orange",
+          [
+            "step",
+            [
+              "coalesce",
+              ["get", "sum_steps"],
+              ["to-number", ["get", "step_count"]]
+            ],
+            "#fff",
+            51,
+            "#ffa500",
+            101,
+            "tomato"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "known-count",
+      "type": "symbol",
+      "source": "known-points",
+      "layout": {
+        "text-field": [
+          "to-string",
+          ["coalesce", ["get", "sum_steps"], ["get", "step_count"]]
+        ],
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 14,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      "paint": {
+        "text-color": "#000"
+      }
+    },
+    {
+      "id": "unknown-circles",
+      "type": "circle",
+      "source": "unknown-points",
+      "paint": {
+        "circle-radius": 15,
+        "circle-color": [
+          "case",
+          ["boolean", ["feature-state", "selected"], false],
+          "orange",
+          "#55f"
+        ]
+      }
+    },
+    {
+      "id": "unknown-count",
+      "type": "symbol",
+      "source": "unknown-points",
+      "layout": {
+        "text-field": "?",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 14,
+        "text-allow-overlap": true,
+        "text-ignore-placement": true
+      },
+      "paint": {
+        "text-color": "#fff"
+      }
+    }
+  ]
+}

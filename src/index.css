@@ -138,7 +138,7 @@ dialog {
   }
 }
 
-.ol-popup {
+div.maplibregl-popup-content {
   background-color: white;
   padding: 12px;
   border-radius: 8px;
