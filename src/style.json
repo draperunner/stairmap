@@ -102,8 +102,23 @@
       "source": "known-points",
       "layout": {
         "text-field": [
-          "to-string",
-          ["coalesce", ["get", "sum_steps"], ["get", "step_count"]]
+          "let",
+          "n",
+          [
+            "coalesce",
+            ["get", "sum_steps"],
+            ["to-number", ["get", "step_count"]]
+          ],
+          [
+            "case",
+            [">=", ["var", "n"], 1000],
+            [
+              "concat",
+              ["to-string", ["round", ["/", ["var", "n"], 1000]]],
+              "k"
+            ],
+            ["to-string", ["var", "n"]]
+          ]
         ],
         "text-font": ["Noto Sans Bold"],
         "text-size": 14,
