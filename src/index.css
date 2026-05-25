@@ -93,15 +93,6 @@ dialog {
   background: #f2f2f2;
 }
 
-#info-bubble {
-  position: absolute;
-  z-index: 500;
-  bottom: 50px;
-  left: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-
 #github-link {
   position: absolute;
   z-index: 500;
@@ -158,8 +149,5 @@ div.maplibregl-popup-content {
   #github-link img {
     width: 24px;
     height: 24px;
-  }
-  #info-bubble {
-    bottom: 24px;
   }
 }

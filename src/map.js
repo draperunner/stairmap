@@ -33,6 +33,32 @@ class SettingsControl {
   }
 }
 
+class InfoControl {
+  constructor(onClick) {
+    this.onClick = onClick;
+  }
+
+  onAdd() {
+    this.container = document.createElement("div");
+    this.container.className = "maplibregl-ctrl maplibregl-ctrl-group";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.title = "Info";
+    button.setAttribute("aria-label", "Info");
+    button.className = "info-button";
+    button.innerHTML = "?";
+    button.addEventListener("click", this.onClick);
+
+    this.container.appendChild(button);
+    return this.container;
+  }
+
+  onRemove() {
+    this.container.parentNode?.removeChild(this.container);
+  }
+}
+
 export const map = new Map({
   container: "map",
   center: [12.307778, 63.990556],
@@ -61,6 +87,11 @@ map.on("load", () => {
       showZoom: true,
       showCompass: false,
     }),
+    "bottom-right",
+  );
+
+  map.addControl(
+    new InfoControl(() => document.getElementById("info-dialog").showModal()),
     "bottom-right",
   );
 

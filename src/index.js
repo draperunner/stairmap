@@ -3,14 +3,12 @@ import "./index.css";
 import { map } from "./map.js";
 
 const infoDialog = document.getElementById("info-dialog");
-const infoShowButton = document.getElementById("info-bubble");
 const infoCloseButton = infoDialog.querySelector("button");
 
 if (!localStorage.getItem("seenInfoBubble")) {
   infoDialog.showModal();
   localStorage.setItem("seenInfoBubble", "true");
 }
-infoShowButton.addEventListener("click", () => infoDialog.showModal());
 infoCloseButton.addEventListener("click", () => infoDialog.close());
 
 const settingsDialog = document.getElementById("settings-dialog");
