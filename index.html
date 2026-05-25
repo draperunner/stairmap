@@ -75,7 +75,7 @@
       <h1>Trappetrening.no</h1>
     </header>
     <div id="map"></div>
-    <dialog>
+    <dialog id="info-dialog">
       <h1>Trappetrening</h1>
       <p>
         Det er kjekt med trappetrening. Men kor er dei gode trappene? Her ser du
@@ -97,14 +97,16 @@
 
       <button>Lukk</button>
     </dialog>
-    <div id="unknown-toggle-wrapper">
+    <dialog id="settings-dialog">
+      <h1>Innstillingar</h1>
       <label>
         <input type="checkbox" id="toggle-unknown" />
         <span id="toggle-unknown-label"
           >Vis trapper utan kjent antal trinn</span
         >
       </label>
-    </div>
+      <button>Lukk</button>
+    </dialog>
     <button id="info-bubble">Vis info</button>
     <a
       id="github-link"

@@ -115,27 +115,18 @@ dialog {
   }
 }
 
-#unknown-toggle-wrapper {
-  position: absolute;
-  left: 20px;
-  top: 100px;
-  z-index: 600;
+#settings-dialog label {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 24px;
+}
 
-  label {
-    background: #fff;
-    padding: 6px 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-  }
+.maplibregl-ctrl-group .settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 div.maplibregl-popup-content {
@@ -170,9 +161,5 @@ div.maplibregl-popup-content {
   }
   #info-bubble {
     bottom: 24px;
-  }
-  #unknown-toggle-wrapper {
-    left: 10px;
-    top: 60px;
   }
 }

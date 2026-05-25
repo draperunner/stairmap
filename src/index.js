@@ -2,16 +2,20 @@ import { Popup, LngLatBounds } from "maplibre-gl";
 import "./index.css";
 import { map } from "./map.js";
 
-const dialog = document.querySelector("dialog");
-const showButton = document.querySelector("#info-bubble");
-const closeButton = document.querySelector("dialog button");
+const infoDialog = document.getElementById("info-dialog");
+const infoShowButton = document.getElementById("info-bubble");
+const infoCloseButton = infoDialog.querySelector("button");
 
 if (!localStorage.getItem("seenInfoBubble")) {
-  dialog.showModal();
+  infoDialog.showModal();
   localStorage.setItem("seenInfoBubble", "true");
 }
-showButton.addEventListener("click", () => dialog.showModal());
-closeButton.addEventListener("click", () => dialog.close());
+infoShowButton.addEventListener("click", () => infoDialog.showModal());
+infoCloseButton.addEventListener("click", () => infoDialog.close());
+
+const settingsDialog = document.getElementById("settings-dialog");
+const settingsCloseButton = settingsDialog.querySelector("button");
+settingsCloseButton.addEventListener("click", () => settingsDialog.close());
 
 const KNOWN_LAYERS = ["known-steps", "known-circles", "known-count"];
 const UNKNOWN_LAYERS = ["unknown-steps", "unknown-circles", "unknown-count"];
@@ -92,7 +96,10 @@ map.on("load", () => {
   }
 
   function showFeaturePopup(lngLat, wayId, properties) {
-    popup.setLngLat(lngLat).setHTML(buildPopupHtml(wayId, properties)).addTo(map);
+    popup
+      .setLngLat(lngLat)
+      .setHTML(buildPopupHtml(wayId, properties))
+      .addTo(map);
   }
 
   function focusOnStair(wayId, fallbackCenter) {
@@ -132,7 +139,11 @@ map.on("load", () => {
       }
       selectFeature(feature.id, sourceId);
       focusOnStair(feature.id, feature.geometry.coordinates);
-      showFeaturePopup(feature.geometry.coordinates, feature.id, feature.properties);
+      showFeaturePopup(
+        feature.geometry.coordinates,
+        feature.id,
+        feature.properties,
+      );
     });
   }
 
